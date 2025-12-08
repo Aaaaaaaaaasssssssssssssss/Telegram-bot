@@ -1,0 +1,90 @@
+# Создайте файл .gitignore чтобы не отправлять ненужные файлы
+cat > .gitignore << 'EOF'
+# Gradle
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.settings/
+.project
+.classpath
+bin/
+
+# NetBeans
+nbproject/
+nbactions.xml
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Render config (local)
+render.yaml.local
+
+# Compiled classes
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+# Unit test reports
+TEST*.xml
+SurefireSUREFIRE-*
+
+# CheckStyle
+checkstyle-output.xml
+checkstyle.xml
+
+# Android
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+
+# Backup files
+*.bak
+*.old
+
+# System files
+.directory
+*~
+EOF
