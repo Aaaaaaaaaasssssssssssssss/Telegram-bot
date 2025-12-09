@@ -11,15 +11,13 @@ import org.telegram.telegrambots.meta.generics.TelegramBot
 
 class TelegramBot(private val token: String) : LongPollingSingleThreadUpdateConsumer, TelegramBot {
     
-    val botUsername: String = "RenderBot"
-    
     init {
         setupCommands()
     }
     
     override fun getBotToken(): String = token
     
-    override fun getBotUsername(): String = botUsername
+    override fun getBotUsername(): String = "RenderBot"
     
     override fun consume(update: Update) {
         try {
@@ -36,60 +34,9 @@ class TelegramBot(private val token: String) : LongPollingSingleThreadUpdateCons
         val text = message.text ?: ""
         
         val response = when {
-            text.startsWith("/start") -> """
-                🚀 Добро пожаловать!
-                
-                Я бот, работающий на Render.com!
-                
-                Команды:
-                /help - Помощь
-                /status - Статус бота
-                /info - Информация
-                
-                💡 Бот автоматически обновляется из GitHub!
-            """.trimIndent()
-            
-            text.startsWith("/help") -> """
-                📚 Доступные команды:
-                
-                /start - Начало работы
-                /help - Эта справка
-                /status - Статус системы
-                /info - Информация о боте
-                /echo [текст] - Повторить текст
-                
-                🛠️ Hosted on Render.com
-            """.trimIndent()
-            
-            text.startsWith("/status") -> """
-                📊 Статус системы:
-                
-                • Платформа: Render.com
-                • Java: ${System.getProperty("java.version")}
-                • Память: ${Runtime.getRuntime().freeMemory() / 1024 / 1024} MB свободно
-                • Время: ${java.time.LocalDateTime.now()}
-                
-                ✅ Все системы работают нормально
-            """.trimIndent()
-            
-            text.startsWith("/info") -> """
-                🤖 Информация о боте:
-                
-                • Имя: @$botUsername
-                • Хостинг: Render.com
-                • Режим: Long Polling
-                • Авто-деплой: включен
-                
-                📦 Исходный код: GitHub
-                🔄 Авто-обновление: при пуше в main
-            """.trimIndent()
-            
-            text.startsWith("/echo ") -> {
-                val echoText = text.substringAfter("/echo ").trim()
-                if (echoText.isNotEmpty()) echoText else "Что повторить?"
-            }
-            
-            else -> "🤔 Команда не распознана. Используй /help"
+            text.startsWith("/start") -> "🚀 Бот запущен на Render!"
+            text.startsWith("/help") -> "📚 Используй /start, /status"
+            else -> "🤔 Используй /help"
         }
         
         sendMessage(chatId, response)
@@ -98,7 +45,6 @@ class TelegramBot(private val token: String) : LongPollingSingleThreadUpdateCons
     private fun sendMessage(chatId: String, text: String) {
         try {
             val message = SendMessage(chatId, text)
-            message.enableHtml(true)
             execute(message)
         } catch (e: TelegramApiException) {
             println("Failed to send message: ${e.message}")
@@ -109,10 +55,7 @@ class TelegramBot(private val token: String) : LongPollingSingleThreadUpdateCons
         try {
             val commands = listOf(
                 BotCommand("start", "Запустить бота"),
-                BotCommand("help", "Помощь"),
-                BotCommand("status", "Статус системы"),
-                BotCommand("info", "Информация"),
-                BotCommand("echo", "Повторить текст")
+                BotCommand("help", "Помощь")
             )
             
             execute(SetMyCommands(commands, BotCommandScopeDefault(), null))
@@ -120,4 +63,4 @@ class TelegramBot(private val token: String) : LongPollingSingleThreadUpdateCons
             println("Failed to set commands: ${e.message}")
         }
     }
-}                
+}
