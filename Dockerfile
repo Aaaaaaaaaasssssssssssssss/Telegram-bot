@@ -2,8 +2,8 @@ FROM gradle:8.5-jdk21 AS build
 WORKDIR /app
 COPY . .
 
-# Добавляем флаги для детального вывода ошибок
-RUN gradle build --no-daemon --stacktrace --info
+# Используем --scan для детального отчета
+RUN gradle build --no-daemon --stacktrace --scan --info
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
