@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import kotlin.system.exitProcess
 
 fun main() {
-    val token = System.getenv("8428502125:AAH6aR4molAk8gKdvBwoMUXCorSeXLxBMEk") ?: run {
+    val token = System.getenv("TELEGRAM_BOT_TOKEN") ?: run {
         println("❌ ERROR: TELEGRAM_BOT_TOKEN environment variable is not set")
         println("🔧 Please set it in Render dashboard -> Environment")
         exitProcess(1)
