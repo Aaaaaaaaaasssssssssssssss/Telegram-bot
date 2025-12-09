@@ -30,7 +30,7 @@ application {
 }
 
 kotlin {
-    jvmToolchain(17)  // Меняем с 21 на 17 (более стабильно)
+    jvmToolchain(21)  
 }
 
 // Простой JAR без Shadow плагина
