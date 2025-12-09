@@ -1,22 +1,27 @@
 package com.example.bot
 
-import org.telegram.telegrambots.bots.TelegramLongPollingBot
+import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
+import org.telegram.telegrambots.meta.generics.TelegramBot
 
-class TelegramBot(token: String) : TelegramLongPollingBot(token) {
+class TelegramBot(private val token: String) : LongPollingSingleThreadUpdateConsumer, TelegramBot {
+    
+    val botUsername: String = "RenderBot"
     
     init {
         setupCommands()
     }
     
-    override fun getBotUsername(): String = "RenderBot"
+    override fun getBotToken(): String = token
     
-    override fun onUpdateReceived(update: Update) {
+    override fun getBotUsername(): String = botUsername
+    
+    override fun consume(update: Update) {
         try {
             if (update.hasMessage() && update.message.hasText()) {
                 handleMessage(update.message)
@@ -70,7 +75,7 @@ class TelegramBot(token: String) : TelegramLongPollingBot(token) {
             text.startsWith("/info") -> """
                 🤖 Информация о боте:
                 
-                • Имя: @${botUsername}
+                • Имя: @$botUsername
                 • Хостинг: Render.com
                 • Режим: Long Polling
                 • Авто-деплой: включен
@@ -115,4 +120,4 @@ class TelegramBot(token: String) : TelegramLongPollingBot(token) {
             println("Failed to set commands: ${e.message}")
         }
     }
-} 
+}                
