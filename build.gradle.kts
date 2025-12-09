@@ -11,8 +11,10 @@ repositories {
 }
 
 dependencies {
-    // Только ОДНА зависимость для Telegram бота
-    implementation("org.telegram:telegrambots:7.9.0")  // Объединяет longpolling и client
+    // Раздельные зависимости - работают лучше
+    implementation("org.telegram:telegrambots-longpolling:7.9.0")
+    implementation("org.telegram:telegrambots-client:7.9.0")
+}
     
     // Ktor (если нужен)
     implementation("io.ktor:ktor-server-core:2.3.10")
