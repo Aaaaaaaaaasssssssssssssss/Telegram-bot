@@ -1,5 +1,5 @@
 # Dockerfile
-FROM gradle:7.6-jdk21-alpine AS build
+FROM gradle:8.5-jdk21-alpine AS build
 WORKDIR /app
 COPY . .
 RUN gradle build --no-daemon
