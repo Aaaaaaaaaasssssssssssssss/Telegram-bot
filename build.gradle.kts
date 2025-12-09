@@ -1,7 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "1.9.23"  // Используем стабильную версию
     application
-    id("com.github.johnrengelman.shadow") version "8.1.7"
 }
 
 group = "com.example"
@@ -12,11 +11,10 @@ repositories {
 }
 
 dependencies {
-    // ВАЖНО: Используйте эти зависимости для нового API
-    implementation("org.telegram:telegrambots-longpolling:7.9.0")
-    implementation("org.telegram:telegrambots-client:7.9.0") // Для execute методов
+    // Только ОДНА зависимость для Telegram бота
+    implementation("org.telegram:telegrambots:7.9.0")  // Объединяет longpolling и client
     
-    // Ktor
+    // Ktor (если нужен)
     implementation("io.ktor:ktor-server-core:2.3.10")
     implementation("io.ktor:ktor-server-netty:2.3.10")
     implementation("io.ktor:ktor-server-status-pages:2.3.10")
@@ -32,20 +30,16 @@ application {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(17)  // Меняем с 21 на 17 (более стабильно)
 }
 
-tasks {
-    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-        archiveBaseName.set("telegram-bot")
-        archiveClassifier.set("")
-        archiveVersion.set("")
-        manifest {
-            attributes(mapOf("Main-Class" to "com.example.bot.MainKt"))
-        }
+// Простой JAR без Shadow плагина
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.example.bot.MainKt"
     }
-    
-    build {
-        dependsOn(shadowJar)
-    }
+    from(configurations.runtimeClasspath.get().map { 
+        if (it.isDirectory) it else zipTree(it) 
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
