@@ -14,7 +14,6 @@ dependencies {
     // Раздельные зависимости - работают лучше
     implementation("org.telegram:telegrambots-longpolling:7.9.0")
     implementation("org.telegram:telegrambots-client:7.9.0")
-}
     
     // Ktor (если нужен)
     implementation("io.ktor:ktor-server-core:2.3.10")
@@ -38,7 +37,7 @@ kotlin {
 // Простой JAR без Shadow плагина
 tasks.jar {
     manifest {
-        attributes["Main-Class"] = "com.example.bot.MainKt"
+        attributes["Main-Class"] = "com.example.bot.MainKt"]
     }
     from(configurations.runtimeClasspath.get().map { 
         if (it.isDirectory) it else zipTree(it) 
