@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 
 # Используем --scan для детального отчета
-RUN gradle build --no-daemon --stacktrace --scan --info
+RUN gradle build --no-daemon --stacktrace --debug --info
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
