@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "1.9.23"
     application
-    id("com.github.johnrengelman.shadow") version "8.1.1"  // Для создания fat JAR
+    id("com.github.johnrengelman.shadow") version "8.1.7"
 }
 
 group = "com.example"
@@ -12,11 +12,11 @@ repositories {
 }
 
 dependencies {
-    // Telegram Bot API
+    // ВАЖНО: Используйте эти зависимости для нового API
     implementation("org.telegram:telegrambots-longpolling:7.9.0")
-    implementation("org.telegram:telegrambots-client:7.9.0")
+    implementation("org.telegram:telegrambots-client:7.9.0") // Для execute методов
     
-    // Для веб-сервера (если нужны дополнительные эндпоинты)
+    // Ktor
     implementation("io.ktor:ktor-server-core:2.3.10")
     implementation("io.ktor:ktor-server-netty:2.3.10")
     implementation("io.ktor:ktor-server-status-pages:2.3.10")
@@ -32,7 +32,7 @@ application {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 tasks {
