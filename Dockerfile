@@ -2,7 +2,7 @@
 FROM gradle:8.5-jdk21-alpine AS build
 WORKDIR /app
 COPY . .
-RUN gradle build --no-daemon --info --stacktrace
+RUN gradle build --no-daemon 
 
 FROM eclipse-temurin:21-jre-alpine 
 WORKDIR /app
