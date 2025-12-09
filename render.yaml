@@ -7,18 +7,4 @@ services:
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
-      - key: PORT
-        value: 8080
-    healthCheckPath: /health
-    autoDeploy: true
     plan: free
-    disk:
-      name: data
-      mountPath: /data
-      sizeGB: 1
-
-# Для базы данных (если нужно)
-databases:
-  - name: botdb
-    plan: free
-    ipAllowList: []
