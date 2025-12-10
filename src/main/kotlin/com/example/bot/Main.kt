@@ -1,48 +1,68 @@
-// build.gradle.kts
-plugins {
-    kotlin("jvm") version "1.9.22"
-    application
-}
+package com.example.bot
 
-group = "com.example"
-version = "1.0.0"
+import org.telegram.telegrambots.meta.TelegramBotsApi
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
+import java.net.HttpURLConnection
+import java.net.URL
 
-application {
-    mainClass.set("com.example.bot.MainKt")
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+fun main() {
+    // Запускаем health check в отдельном потоке
+    Thread {
+        startHealthServer()
+    }.apply {
+        isDaemon = true
+        start()
+    }
+    
+    // Даем время health серверу запуститься
+    Thread.sleep(2000)
+    
+    try {
+        val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
+        val bot = TelegramBot()
+        botsApi.registerBot(bot)
+        
+        println("✅ Bot started with Java ${System.getProperty("java.version")}")
+        
+        // Держим приложение живым
+        Thread.currentThread().join()
+    } catch (e: Exception) {
+        println("❌ Failed to start bot: ${e.message}")
+        e.printStackTrace()
+        System.exit(1)
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    // Только самое необходимое
-    implementation("org.telegram:telegrambots:6.9.7.1")
+fun startHealthServer() {
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
     
-    // Минимальные HTTP зависимости вместо Ktor
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    
-    // Логирование
-    implementation("org.slf4j:slf4j-simple:2.0.9")
-}
-
-tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "21"
-    }
-    
-    jar {
-        manifest {
-            attributes["Main-Class"] = "com.example.bot.MainKt"
+    try {
+        // Простой HTTP сервер на чистом Java
+        val server = com.sun.net.httpserver.HttpServer.create(
+            java.net.InetSocketAddress(port), 0
+        )
+        
+        server.createContext("/health") { exchange ->
+            val response = "OK"
+            exchange.sendResponseHeaders(200, response.length.toLong())
+            exchange.responseBody.use { it.write(response.toByteArray()) }
         }
-        from(configurations.runtimeClasspath.get()
-            .map { if (it.isDirectory) it else zipTree(it) })
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        
+        server.createContext("/") { exchange ->
+            val response = """
+                Telegram Bot Status: ONLINE
+                Java: ${System.getProperty("java.version")}
+                Memory: ${Runtime.getRuntime().totalMemory() / 1024 / 1024}MB
+            """.trimIndent()
+            exchange.sendResponseHeaders(200, response.length.toLong())
+            exchange.responseBody.use { it.write(response.toByteArray()) }
+        }
+        
+        server.executor = null // Используем текущий поток
+        server.start()
+        println("🏥 Health server started on port $port")
+    } catch (e: Exception) {
+        println("⚠️ Health server failed: ${e.message}")
+        // Не падаем, если health server не запустился
     }
 }
