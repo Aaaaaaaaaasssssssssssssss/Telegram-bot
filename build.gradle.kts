@@ -1,7 +1,7 @@
+// build.gradle.kts
 plugins {
-    kotlin("jvm") version "1.9.22" // Совместима с Java 21
+    kotlin("jvm") version "1.9.22"
     application
-    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.example"
@@ -22,47 +22,27 @@ repositories {
 }
 
 dependencies {
-    // Telegram Bot API (проверенная версия)
+    // Только самое необходимое
     implementation("org.telegram:telegrambots:6.9.7.1")
     
-    // Ktor с минимальными зависимостями
-    implementation("io.ktor:ktor-server-core:2.3.7")
-    implementation("io.ktor:ktor-server-netty:2.3.7")
-    implementation("io.ktor:ktor-server-status-pages:2.3.7")
+    // Минимальные HTTP зависимости вместо Ktor
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     
     // Логирование
-    implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation("org.slf4j:slf4j-simple:2.0.9")
 }
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "21"
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-        }
+        kotlinOptions.jvmTarget = "21"
     }
     
-    // Настраиваем shadowJar для минимального размера
-    shadowJar {
-        archiveBaseName.set("bot")
-        archiveClassifier.set("")
-        archiveVersion.set("")
+    jar {
         manifest {
             attributes["Main-Class"] = "com.example.bot.MainKt"
         }
-        
-        // Минимизируем размер
-        minimize {
-            exclude(dependency("org.telegram:telegrambots:.*"))
-        }
-        
-        // Исключаем ненужные файлы
-        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
-        exclude("**/module-info.class")
-    }
-    
-    // Оптимизация сборки для CI/CD
-    build {
-        dependsOn(shadowJar)
+        from(configurations.runtimeClasspath.get()
+            .map { if (it.isDirectory) it else zipTree(it) })
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
