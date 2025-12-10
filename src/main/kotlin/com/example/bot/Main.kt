@@ -1,65 +1,48 @@
-package com.example.bot
+// build.gradle.kts
+plugins {
+    kotlin("jvm") version "1.9.22"
+    application
+}
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.plugins.statuspages.*
-import org.telegram.telegrambots.meta.TelegramBotsApi
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
-import kotlin.system.exitProcess
+group = "com.example"
+version = "1.0.0"
 
-fun main() {
-    val token = System.getenv("TELEGRAM_BOT_TOKEN") ?: run {
-        println("❌ ERROR: TELEGRAM_BOT_TOKEN environment variable is not set")
-        println("🔧 Please set it in Render dashboard -> Environment")
-        exitProcess(1)
-    }
-    
-    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
-    
-    startHealthServer(port)
-    
-    try {
-        // СТАРЫЙ API
-        val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
-        val bot = TelegramBot() // Создаем бота (токен берется из переменных окружения внутри класса)
-        botsApi.registerBot(bot)
-        
-        println("✅ Bot successfully started on Render!")
-        println("🌐 Health check available at: http://localhost:$port/health")
-        println("🤖 Bot username: @${bot.botUsername}")
-        
-        while (true) {
-            Thread.sleep(1000)
-        }
-    } catch (e: Exception) {
-        println("❌ Failed to start bot: ${e.message}")
-        e.printStackTrace()
-        exitProcess(1)
+application {
+    mainClass.set("com.example.bot.MainKt")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
-fun startHealthServer(port: Int) {
-    val server = embeddedServer(Netty, port = port) {
-        install(StatusPages) {
-            status(HttpStatusCode.NotFound) { call, _ ->
-                call.respondText("Not Found", status = HttpStatusCode.NotFound)
-            }
-        }
-        
-        routing {
-            get("/") {
-                call.respondText("Telegram Bot is running! 🤖")
-            }
-            
-            get("/health") {
-                call.respondText("OK")
-            }
-        }
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Только самое необходимое
+    implementation("org.telegram:telegrambots:6.9.7.1")
+    
+    // Минимальные HTTP зависимости вместо Ktor
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    
+    // Логирование
+    implementation("org.slf4j:slf4j-simple:2.0.9")
+}
+
+tasks {
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "21"
     }
     
-    server.start(wait = false)
-}                
+    jar {
+        manifest {
+            attributes["Main-Class"] = "com.example.bot.MainKt"
+        }
+        from(configurations.runtimeClasspath.get()
+            .map { if (it.isDirectory) it else zipTree(it) })
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
