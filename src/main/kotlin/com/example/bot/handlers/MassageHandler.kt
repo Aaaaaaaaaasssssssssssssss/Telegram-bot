@@ -13,7 +13,7 @@ class MessageHandler {
         val response = when {
             text.contains("привет", ignoreCase = true) -> "И тебе привет!"
             text.contains("как дела", ignoreCase = true) -> "У меня всё отлично! А у тебя?"
-            else -> "Я получил твое сообщение: \"$text\""
+            else -> ""
         }
         
         val sendMessage = SendMessage(chatId, response)
