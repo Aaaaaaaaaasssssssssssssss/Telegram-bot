@@ -14,6 +14,7 @@ class MessageHandler {
             text.contains("привет", ignoreCase = true) -> "И тебе привет!"
             text.contains("как дела", ignoreCase = true) -> "У меня всё отлично! А у тебя?"
             text.contains("Ужас", ignoreCase = true) -> "Бррр, страшно!"
+            else -> ""
         }
         
         val sendMessage = SendMessage(chatId, response)
