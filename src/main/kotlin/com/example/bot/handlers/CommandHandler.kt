@@ -4,6 +4,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
 class CommandHandler {
     
@@ -11,36 +12,82 @@ class CommandHandler {
         val chatId = message.chatId.toString()
         val text = message.text ?: ""
         
+        // Проверяем на опасные команды
+        if (isDangerousCommand(text)) {
+            println("⚠️ Blocked dangerous command from ${message.from.userName}")
+            return
+        }
+        
         val response = when {
             text.startsWith("/start") -> {
-                "Привет! Я пример бота. Используй /help для списка команд."
+                """
+                👋 Привет! Я минималистичный бот.
+                
+                Я отвечаю на:
+                • "привет"
+                • "как дела"
+                • "ужас"
+                
+                И понимаю команды:
+                /start - это сообщение
+                /help - список команд
+                /echo [текст] - повтор текста
+                """.trimIndent()
             }
             text.startsWith("/help") -> {
                 """
-                Доступные команды:
-                /start - начать работу
-                /help - помощь
+                📋 Доступные команды:
+                /start - начало работы
+                /help - эта справка
                 /echo [текст] - повторить текст
+                
+                Также я отвечаю на слова:
+                привет, как дела, ужас
                 """.trimIndent()
             }
             text.startsWith("/echo") -> {
                 val args = text.substringAfter("/echo").trim()
-                if (args.isNotEmpty()) args else "Что повторить?"
+                if (args.isNotEmpty()) "📢 $args" else "❓ Что повторить?"
             }
-            else -> "Неизвестная команда. Используй /help"
+            else -> "🤔 Неизвестная команда. Попробуй /help"
         }
         
-        val sendMessage = SendMessage(chatId, response)
-        bot.execute(sendMessage)
+        try {
+            val sendMessage = SendMessage(chatId, response)
+            bot.execute(sendMessage)
+        } catch (e: TelegramApiException) {
+            println("❌ Telegram API error: ${e.message}")
+        } catch (e: Exception) {
+            println("❌ Unexpected error: ${e.message}")
+        }
+    }
+    
+    private fun isDangerousCommand(text: String): Boolean {
+        // Блокируем опасные команды
+        val dangerousCommands = listOf(
+            "/admin",
+            "/root", 
+            "/sudo",
+            "/system",
+            "/shell",
+            "/exec"
+        )
+        
+        return dangerousCommands.any { text.startsWith(it, ignoreCase = true) }
     }
     
     fun handleCallbackQuery(callbackQuery: CallbackQuery, bot: TelegramLongPollingBot) {
-        // Обработка нажатий на inline-кнопки
+        // Без изменений
         val chatId = callbackQuery.message.chatId.toString()
-        val data = callbackQuery.data
+        val data = callbackQuery.data ?: ""
         
         val response = "Вы нажали: $data"
-        val sendMessage = SendMessage(chatId, response)
-        bot.execute(sendMessage)
+        
+        try {
+            val sendMessage = SendMessage(chatId, response)
+            bot.execute(sendMessage)
+        } catch (e: Exception) {
+            println("❌ Error handling callback: ${e.message}")
+        }
     }
 }
