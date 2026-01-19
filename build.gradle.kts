@@ -13,7 +13,7 @@ application {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -30,11 +30,14 @@ dependencies {
     
     // Логирование
     implementation("org.slf4j:slf4j-simple:2.0.9")
+    
+    // OpenAI GPT-4 library for media processing
+    implementation("com.theokanning.openai-gpt3-java:service:0.18.2")
 }
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "21"
+        kotlinOptions.jvmTarget = "17"
     }
     
     jar {

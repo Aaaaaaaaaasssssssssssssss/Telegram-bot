@@ -1,11 +1,15 @@
 package com.example.bot.handlers
 
+import com.theokanning.openai.completion.chat.ChatCompletionRequest
+import com.theokanning.openai.completion.chat.ChatMessage
+import com.theokanning.openai.completion.chat.ChatMessageRole
+import com.theokanning.openai.service.OpenAiService
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
-class MessageHandler {
+class MessageHandler(private val openAiService: OpenAiService) {
     
     fun handleMessage(message: Message, bot: TelegramLongPollingBot) {
         val chatId = message.chatId.toString()
@@ -22,17 +26,20 @@ class MessageHandler {
             return
         }
         
-        // Отвечаем ТОЛЬКО на определенные фразы
-        val response = when {
-            text.contains("привет", ignoreCase = true) -> "И тебе привет! 👋"
-            text.contains("как дела", ignoreCase = true) -> "У меня всё отлично! А у тебя? 😊"
-            text.contains("ужас", ignoreCase = true) -> "Бррр, страшно! 😨"
-            else -> null // Не отвечаем на другие сообщения
-        }
-        
-        // Отправляем ответ только если он есть
-        response?.let {
-            sendResponse(chatId, it, bot)
+        // Отвечаем через GPT-4
+        try {
+            val chatRequest = ChatCompletionRequest.builder()
+                .model("gpt-4")
+                .messages(listOf(ChatMessage(ChatMessageRole.USER.value(), text)))
+                .build()
+            
+            val response = openAiService.createChatCompletion(chatRequest)
+            val reply = response.choices[0].message.content
+            
+            sendResponse(chatId, reply, bot)
+        } catch (e: Exception) {
+            println("❌ GPT error: ${e.message}")
+            sendResponse(chatId, "Извините, произошла ошибка при обработке вашего сообщения.", bot)
         }
     }
     

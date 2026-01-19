@@ -2,6 +2,7 @@ package com.example.bot
 
 import com.example.bot.handlers.CommandHandler
 import com.example.bot.handlers.MessageHandler
+import com.theokanning.openai.service.OpenAiService
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands
 import org.telegram.telegrambots.meta.api.objects.Update
@@ -9,10 +10,10 @@ import org.telegram.telegrambots.meta.api.objects.commands.BotCommand
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
-class TelegramBot : TelegramLongPollingBot() {
+class TelegramBot(private val openAiService: OpenAiService) : TelegramLongPollingBot() {
     
     private val commandHandler = CommandHandler()
-    private val messageHandler = MessageHandler()
+    private val messageHandler = MessageHandler(openAiService)
     
     init {
         setupCommands()

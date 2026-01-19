@@ -2,6 +2,7 @@ package com.example.bot
 
 import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
+import com.theokanning.openai.service.OpenAiService
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -18,8 +19,10 @@ fun main() {
     Thread.sleep(2000)
     
     try {
+        val openAiService = OpenAiService(System.getenv("OPENAI_API_KEY") ?: throw IllegalArgumentException("OPENAI_API_KEY not set"))
+        
         val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
-        val bot = TelegramBot()
+        val bot = TelegramBot(openAiService)
         botsApi.registerBot(bot)
         
         println("✅ Bot started with Java ${System.getProperty("java.version")}")
