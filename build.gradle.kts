@@ -31,8 +31,8 @@ dependencies {
     // Логирование
     implementation("org.slf4j:slf4j-simple:2.0.9")
     
-    // OpenAI GPT-4 library for media processing
-    implementation("com.theokanning.openai-gpt3-java:service:0.18.2")
+    // DeepSeek AI library for chat completions
+    implementation("com.theokanning:openai-java:0.18.2")
 }
 
 tasks {

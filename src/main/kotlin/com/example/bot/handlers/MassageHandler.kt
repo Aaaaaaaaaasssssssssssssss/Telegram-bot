@@ -26,10 +26,10 @@ class MessageHandler(private val openAiService: OpenAiService) {
             return
         }
         
-        // Отвечаем через GPT-4
+        // Отвечаем через DeepSeek
         try {
             val chatRequest = ChatCompletionRequest.builder()
-                .model("gpt-4")
+                .model("deepseek-chat")
                 .messages(listOf(ChatMessage(ChatMessageRole.USER.value(), text)))
                 .build()
             
@@ -38,7 +38,7 @@ class MessageHandler(private val openAiService: OpenAiService) {
             
             sendResponse(chatId, reply, bot)
         } catch (e: Exception) {
-            println("❌ GPT error: ${e.message}")
+            println("❌ DeepSeek error: ${e.message}")
             sendResponse(chatId, "Извините, произошла ошибка при обработке вашего сообщения.", bot)
         }
     }

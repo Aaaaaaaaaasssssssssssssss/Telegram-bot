@@ -5,6 +5,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 import com.theokanning.openai.service.OpenAiService
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.Duration
 
 fun main() {
     // Запускаем health check в отдельном потоке
@@ -19,7 +20,7 @@ fun main() {
     Thread.sleep(2000)
     
     try {
-        val openAiService = OpenAiService(System.getenv("OPENAI_API_KEY") ?: throw IllegalArgumentException("OPENAI_API_KEY not set"))
+        val openAiService = OpenAiService(System.getenv("DEEPSEEK_API_KEY") ?: throw IllegalArgumentException("DEEPSEEK_API_KEY not set"), Duration.ofSeconds(30), "https://api.deepseek.com/v1")
         
         val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
         val bot = TelegramBot(openAiService)
